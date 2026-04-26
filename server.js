@@ -99,10 +99,20 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
 });
 
-// 404 handler
+// Explicit favicon route (ensures it's never caught by SPA fallback)
+app.get('/favicon.svg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.sendFile(path.join(__dirname, 'public', 'favicon.svg'));
+});
+
+// 404 handler — only serve index.html for routes without file extensions (SPA fallback)
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found.' });
+  }
+  // If the path has a file extension, it's a missing static file — return 404
+  if (path.extname(req.path)) {
+    return res.status(404).send('Not found');
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
