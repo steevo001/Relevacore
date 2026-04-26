@@ -1,119 +1,171 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-let transporter = null;
+let resend = null;
 
-function getTransporter() {
-  if (!transporter) {
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.warn('⚠️  Email not configured (SMTP_USER/SMTP_PASS missing). Emails will be logged to console.');
-      return null;
-    }
-
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
+function getResend() {
+  if (!resend && process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
   }
-  return transporter;
+  return resend;
 }
 
-async function sendEmail({ to, subject, html }) {
-  const transport = getTransporter();
+const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'admin@relevacore.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'RelevaCore <onboarding@resend.dev>';
 
-  if (!transport) {
-    console.log('📧 [EMAIL LOG]');
+// ─── Send email via Resend ────────────────────────────────────
+async function sendEmail({ to, subject, html }) {
+  const client = getResend();
+  if (!client) {
+    console.log('📧 [Email not configured] Would have sent:');
     console.log(`   To: ${to}`);
     console.log(`   Subject: ${subject}`);
-    console.log(`   Body: ${html.substring(0, 200)}...`);
-    return { logged: true };
+    console.log('   (Set RESEND_API_KEY in .env to enable real emails)');
+    return;
   }
 
   try {
-    const result = await transport.sendMail({
-      from: `"RelevaCore" <${process.env.EMAIL_FROM || 'noreply@relevacore.com'}>`,
-      to,
+    const { data, error } = await client.emails.send({
+      from: FROM_EMAIL,
+      to: [to],
       subject,
       html
     });
-    return result;
-  } catch (error) {
-    console.error('Email send error:', error);
-    throw error;
+
+    if (error) {
+      console.error('Email send error:', error);
+      return;
+    }
+
+    console.log(`✅ Email sent to ${to}: ${subject} (ID: ${data?.id})`);
+  } catch (err) {
+    console.error('Email service error:', err.message);
   }
 }
 
-async function sendLeadNotification(lead) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@relevacore.com';
-  return sendEmail({
-    to: adminEmail,
-    subject: `🚀 New Lead: ${lead.name} — ${lead.source || 'Website'}`,
-    html: `
-      <div style="font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e4e7; padding: 2rem; border-radius: 16px;">
-        <h2 style="color: #c084fc; margin-bottom: 1rem;">New Lead Received</h2>
-        <table style="color: #d4d4d8; font-size: 14px; border-collapse: collapse;">
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Name</td><td style="padding: 6px 12px;">${lead.name}</td></tr>
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Email</td><td style="padding: 6px 12px;">${lead.email}</td></tr>
-          ${lead.phone ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Phone</td><td style="padding: 6px 12px;">${lead.phone}</td></tr>` : ''}
-          ${lead.company ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Company</td><td style="padding: 6px 12px;">${lead.company}</td></tr>` : ''}
-          ${lead.service ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Service</td><td style="padding: 6px 12px;">${lead.service}</td></tr>` : ''}
-          ${lead.message ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Message</td><td style="padding: 6px 12px;">${lead.message}</td></tr>` : ''}
-        </table>
-        <p style="margin-top: 1.5rem; color: #71717a; font-size: 12px;">Source: ${lead.source || 'Website'} | ${new Date().toLocaleString()}</p>
+// ─── Branded HTML template ────────────────────────────────────
+function wrapTemplate(title, content) {
+  return `
+    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0b0c10; color: #e4e4e7; border-radius: 16px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #1f1b3a, #0b0c10); padding: 30px 30px 20px; text-align: center; border-bottom: 1px solid rgba(168,85,247,0.2);">
+        <h1 style="color: #c084fc; font-size: 24px; margin: 0;">⬡ RelevaCore</h1>
+        <p style="color: #71717a; font-size: 12px; margin: 5px 0 0;">Brand Marketing Agency</p>
       </div>
-    `
-  });
+      <div style="padding: 30px;">
+        <h2 style="color: #f5f5f5; font-size: 20px; margin: 0 0 20px;">${title}</h2>
+        ${content}
+      </div>
+      <div style="background: rgba(255,255,255,0.03); padding: 20px 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2025 RelevaCore — Automated notification</p>
+      </div>
+    </div>
+  `;
 }
 
-async function sendConsultationConfirmation(booking) {
-  return sendEmail({
-    to: booking.email,
-    subject: '✅ Consultation Booked — RelevaCore',
-    html: `
-      <div style="font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e4e7; padding: 2rem; border-radius: 16px;">
-        <h2 style="color: #c084fc;">Your Consultation is Booked!</h2>
-        <p style="color: #d4d4d8;">Hi ${booking.name},</p>
-        <p style="color: #a1a1aa;">Thank you for booking a free consultation with RelevaCore. Here are your details:</p>
-        <div style="background: rgba(168,85,247,0.1); padding: 1rem; border-radius: 12px; margin: 1rem 0;">
-          <p style="color: #d4d4d8;"><strong>Date:</strong> ${booking.preferred_date || 'TBD'}</p>
-          <p style="color: #d4d4d8;"><strong>Time:</strong> ${booking.preferred_time || 'TBD'}</p>
-          ${booking.topic ? `<p style="color: #d4d4d8;"><strong>Topic:</strong> ${booking.topic}</p>` : ''}
-        </div>
-        <p style="color: #a1a1aa;">We'll confirm the exact time shortly. If you need to reschedule, reply to this email.</p>
-        <p style="color: #71717a; font-size: 12px; margin-top: 1.5rem;">— The RelevaCore Team</p>
-      </div>
-    `
+function fieldRow(label, value) {
+  if (!value) return '';
+  return `
+    <tr>
+      <td style="padding: 8px 12px; color: #71717a; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); width: 120px; vertical-align: top;">${label}</td>
+      <td style="padding: 8px 12px; color: #e4e4e7; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05);">${value}</td>
+    </tr>
+  `;
+}
+
+// ─── Notification functions ───────────────────────────────────
+
+async function sendLeadNotification(lead) {
+  const content = `
+    <p style="color: #a1a1aa; margin: 0 0 20px;">You have a new lead submission on RelevaCore.</p>
+    <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
+      ${fieldRow('Name', lead.name)}
+      ${fieldRow('Email', `<a href="mailto:${lead.email}" style="color: #c084fc;">${lead.email}</a>`)}
+      ${fieldRow('Phone', lead.phone)}
+      ${fieldRow('Company', lead.company)}
+      ${fieldRow('Service', lead.service)}
+      ${fieldRow('Source', lead.source)}
+      ${fieldRow('Message', lead.message)}
+    </table>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'https://relevacore.onrender.com'}/admin/leads" style="display: inline-block; background: #a855f7; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">View in Dashboard →</a>
+    </div>
+  `;
+
+  await sendEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: `🔔 New Lead: ${lead.name} — ${lead.service || 'General Inquiry'}`,
+    html: wrapTemplate('New Lead Received', content)
   });
 }
 
 async function sendConsultationNotification(booking) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@relevacore.com';
-  return sendEmail({
-    to: adminEmail,
-    subject: `📅 New Consultation Booking: ${booking.name}`,
-    html: `
-      <div style="font-family: 'Inter', sans-serif; background: #0b0c10; color: #e4e4e7; padding: 2rem; border-radius: 16px;">
-        <h2 style="color: #c084fc;">New Consultation Request</h2>
-        <table style="color: #d4d4d8; font-size: 14px; border-collapse: collapse;">
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Name</td><td style="padding: 6px 12px;">${booking.name}</td></tr>
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Email</td><td style="padding: 6px 12px;">${booking.email}</td></tr>
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Date</td><td style="padding: 6px 12px;">${booking.preferred_date || 'TBD'}</td></tr>
-          <tr><td style="padding: 6px 12px; color: #a1a1aa;">Time</td><td style="padding: 6px 12px;">${booking.preferred_time || 'TBD'}</td></tr>
-          ${booking.topic ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Topic</td><td style="padding: 6px 12px;">${booking.topic}</td></tr>` : ''}
-          ${booking.message ? `<tr><td style="padding: 6px 12px; color: #a1a1aa;">Message</td><td style="padding: 6px 12px;">${booking.message}</td></tr>` : ''}
-        </table>
-      </div>
-    `
+  const content = `
+    <p style="color: #a1a1aa; margin: 0 0 20px;">A new consultation has been booked.</p>
+    <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
+      ${fieldRow('Name', booking.name)}
+      ${fieldRow('Email', `<a href="mailto:${booking.email}" style="color: #c084fc;">${booking.email}</a>`)}
+      ${fieldRow('Date', booking.preferred_date)}
+      ${fieldRow('Time', booking.preferred_time)}
+      ${fieldRow('Topic', booking.topic)}
+      ${fieldRow('Message', booking.message)}
+    </table>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'https://relevacore.onrender.com'}/admin/consultations" style="display: inline-block; background: #a855f7; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">View in Dashboard →</a>
+    </div>
+  `;
+
+  await sendEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: `📅 New Consultation: ${booking.name} — ${booking.topic || 'General'}`,
+    html: wrapTemplate('New Consultation Booked', content)
+  });
+}
+
+async function sendConsultationConfirmation(booking) {
+  const content = `
+    <p style="color: #a1a1aa; margin: 0 0 20px;">Hi ${booking.name},</p>
+    <p style="color: #d4d4d8; margin: 0 0 20px;">Thanks for booking a consultation with RelevaCore! We've received your request and our team will confirm your slot shortly.</p>
+    <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
+      ${fieldRow('Date', booking.preferred_date || 'To be confirmed')}
+      ${fieldRow('Time', booking.preferred_time || 'To be confirmed')}
+      ${fieldRow('Topic', booking.topic || 'General')}
+    </table>
+    <p style="color: #a1a1aa; margin: 20px 0 0; font-size: 13px;">We'll send you a confirmation email with the meeting link within 24 hours.</p>
+  `;
+
+  await sendEmail({
+    to: booking.email,
+    subject: `✅ Consultation Request Received — RelevaCore`,
+    html: wrapTemplate('Consultation Booked!', content)
+  });
+}
+
+async function sendPricingNotification(inquiry) {
+  const content = `
+    <p style="color: #a1a1aa; margin: 0 0 20px;">A new pricing inquiry has come in.</p>
+    <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
+      ${fieldRow('Name', inquiry.name)}
+      ${fieldRow('Email', `<a href="mailto:${inquiry.email}" style="color: #c084fc;">${inquiry.email}</a>`)}
+      ${fieldRow('Plan', `<strong style="color: #c084fc;">${inquiry.plan}</strong>`)}
+      ${fieldRow('Phone', inquiry.phone)}
+      ${fieldRow('Company', inquiry.company)}
+      ${fieldRow('Message', inquiry.message)}
+    </table>
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="${process.env.FRONTEND_URL || 'https://relevacore.onrender.com'}/admin/leads" style="display: inline-block; background: #a855f7; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">View in Dashboard →</a>
+    </div>
+  `;
+
+  await sendEmail({
+    to: NOTIFICATION_EMAIL,
+    subject: `💰 Pricing Inquiry: ${inquiry.name} — ${inquiry.plan} Plan`,
+    html: wrapTemplate('New Pricing Inquiry', content)
   });
 }
 
 module.exports = {
   sendEmail,
   sendLeadNotification,
+  sendConsultationNotification,
   sendConsultationConfirmation,
-  sendConsultationNotification
+  sendPricingNotification
 };

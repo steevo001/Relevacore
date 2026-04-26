@@ -4,7 +4,7 @@ const { body } = require('express-validator');
 const db = require('../database/db');
 const authMiddleware = require('../middleware/auth');
 const validate = require('../middleware/validate');
-const { sendLeadNotification } = require('../services/email');
+const { sendPricingNotification } = require('../services/email');
 
 router.post('/inquiry', [
   body('name').trim().notEmpty().withMessage('Name is required'),
@@ -20,7 +20,7 @@ router.post('/inquiry', [
       'INSERT INTO pricing_inquiries (name, email, phone, company, plan, message) VALUES (?, ?, ?, ?, ?, ?)',
       [name, email, phone || null, company || null, plan, message || null]
     );
-    sendLeadNotification({ name, email, phone, company, service: `Plan: ${plan}`, message, source: 'pricing_inquiry' }).catch(console.error);
+    sendPricingNotification({ name, email, phone, company, plan, message }).catch(console.error);
     res.status(201).json({ message: 'Thanks! We\'ll reach out within 24 hours.', id: result.lastInsertRowid });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Something went wrong.' }); }
 });
