@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RelevaCore Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-logo"><i class="fas fa-cube"></i> RelevaCore</a>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
+        <a href="/admin/leads" class="nav-item"><i class="fas fa-user-plus"></i> <span>Leads</span></a>
+        <a href="/admin/consultations" class="nav-item"><i class="fas fa-calendar-check"></i> <span>Consultations</span></a>
+        <a href="/admin/blog" class="nav-item"><i class="fas fa-edit"></i> <span>Blog</span></a>
+        <a href="/admin/portfolio" class="nav-item"><i class="fas fa-briefcase"></i> <span>Portfolio</span></a>
+        <a href="/admin/newsletter" class="nav-item"><i class="fas fa-envelope"></i> <span>Newsletter</span></a>
+        <div class="nav-divider"></div>
+        <a href="/" class="nav-item"><i class="fas fa-external-link-alt"></i> <span>View Site</span></a>
+        <button class="nav-item" onclick="logout()" style="border:none;background:none;width:100%;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Welcome back! Here's your overview.</p>
+        </div>
+        <div class="admin-header-actions">
+          <span id="adminEmail" style="color: #71717a; font-size: 0.85rem;"></span>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(96,165,250,0.12);"><i class="fas fa-user-plus" style="color:#60a5fa;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statLeads">-</span>
+            <span class="stat-label">Total Leads</span>
+          </div>
+          <span class="stat-badge" id="statNewLeads"></span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(168,85,247,0.12);"><i class="fas fa-calendar-check" style="color:#c084fc;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statConsultations">-</span>
+            <span class="stat-label">Consultations</span>
+          </div>
+          <span class="stat-badge" id="statPendingConsultations"></span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(74,222,128,0.12);"><i class="fas fa-envelope" style="color:#4ade80;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statSubscribers">-</span>
+            <span class="stat-label">Subscribers</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(251,191,36,0.12);"><i class="fas fa-eye" style="color:#fbbf24;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statViews">-</span>
+            <span class="stat-label">Blog Views</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(248,113,113,0.12);"><i class="fas fa-dollar-sign" style="color:#f87171;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statInquiries">-</span>
+            <span class="stat-label">Pricing Inquiries</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(96,165,250,0.12);"><i class="fas fa-newspaper" style="color:#60a5fa;"></i></div>
+          <div class="stat-info">
+            <span class="stat-value" id="statPosts">-</span>
+            <span class="stat-label">Published Posts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="admin-section">
+        <h2><i class="fas fa-clock"></i> Recent Activity</h2>
+        <div class="activity-list" id="activityList">
+          <div class="loading-row"><div class="spinner" style="display:block;width:24px;height:24px;margin:2rem auto;"></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    checkAuth();
+
+    async function checkAuth() {
+      if (!API.isLoggedIn()) {
+        window.location.href = '/admin';
+        return;
+      }
+      try {
+        const data = await API.getMe();
+        document.getElementById('adminEmail').textContent = data.admin.email;
+      } catch {
+        window.location.href = '/admin';
+      }
+      loadDashboard();
+    }
+
+    function logout() {
+      API.clearToken();
+      window.location.href = '/admin';
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    async function loadDashboard() {
+      try {
+        const stats = await API.getDashboardStats();
+        document.getElementById('statLeads').textContent = stats.totalLeads;
+        document.getElementById('statConsultations').textContent = stats.totalConsultations;
+        document.getElementById('statSubscribers').textContent = stats.totalSubscribers;
+        document.getElementById('statViews').textContent = stats.totalBlogViews;
+        document.getElementById('statInquiries').textContent = stats.totalPricingInquiries;
+        document.getElementById('statPosts').textContent = stats.totalBlogPosts;
+
+        if (stats.newLeads > 0) {
+          document.getElementById('statNewLeads').textContent = `${stats.newLeads} new`;
+          document.getElementById('statNewLeads').style.display = 'inline';
+        }
+        if (stats.pendingConsultations > 0) {
+          document.getElementById('statPendingConsultations').textContent = `${stats.pendingConsultations} pending`;
+          document.getElementById('statPendingConsultations').style.display = 'inline';
+        }
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+
+      try {
+        const data = await API.getRecentActivity();
+        const list = document.getElementById('activityList');
+
+        if (data.activity.length === 0) {
+          list.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><h3>No activity yet</h3><p>Activity will appear here as you receive leads and submissions.</p></div>';
+          return;
+        }
+
+        list.innerHTML = data.activity.map(item => {
+          let icon, color, label;
+          switch (item.type) {
+            case 'lead': icon = 'fa-user-plus'; color = '#60a5fa'; label = 'New lead'; break;
+            case 'consultation': icon = 'fa-calendar-check'; color = '#c084fc'; label = 'Consultation'; break;
+            case 'subscriber': icon = 'fa-envelope'; color = '#4ade80'; label = 'New subscriber'; break;
+            case 'pricing_inquiry': icon = 'fa-dollar-sign'; color = '#fbbf24'; label = `${item.plan} inquiry`; break;
+            default: icon = 'fa-bell'; color = '#71717a'; label = 'Activity';
+          }
+
+          const time = new Date(item.created_at).toLocaleString();
+
+          return `
+            <div class="activity-item">
+              <div class="activity-icon" style="background: ${color}20;"><i class="fas ${icon}" style="color:${color};"></i></div>
+              <div class="activity-info">
+                <span class="activity-label">${label}</span>
+                <span class="activity-detail">${item.name || item.email || ''} ${item.email ? `— ${item.email}` : ''}</span>
+              </div>
+              <span class="activity-time">${time}</span>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Failed to load activity:', err);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads | RelevaCore Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-logo"><i class="fas fa-cube"></i> <span>RelevaCore</span></a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
+        <a href="/admin/leads" class="nav-item active"><i class="fas fa-user-plus"></i> <span>Leads</span></a>
+        <a href="/admin/consultations" class="nav-item"><i class="fas fa-calendar-check"></i> <span>Consultations</span></a>
+        <a href="/admin/blog" class="nav-item"><i class="fas fa-edit"></i> <span>Blog</span></a>
+        <a href="/admin/portfolio" class="nav-item"><i class="fas fa-briefcase"></i> <span>Portfolio</span></a>
+        <a href="/admin/newsletter" class="nav-item"><i class="fas fa-envelope"></i> <span>Newsletter</span></a>
+        <div class="nav-divider"></div>
+        <a href="/" class="nav-item"><i class="fas fa-external-link-alt"></i> <span>View Site</span></a>
+        <button class="nav-item" onclick="logout()" style="border:none;background:none;width:100%;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h1>Leads</h1>
+          <p class="subtitle">Manage incoming project inquiries and contact submissions.</p>
+        </div>
+      </div>
+      <div class="admin-toolbar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search by name, email, company..." oninput="debounceSearch()">
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <select class="status-select" id="statusFilter" onchange="loadLeads()" style="padding:0.6rem 1rem;border-radius:12px;">
+            <option value="">All status</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="converted">Converted</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Service</th>
+              <th>Source</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTableBody">
+            <tr><td colspan="8" style="text-align:center;padding:3rem;color:#71717a;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script src="/js/api.js"></script>
+  <script>
+    if (!API.isLoggedIn()) window.location.href = '/admin';
+    function logout() { API.clearToken(); window.location.href = '/admin'; }
+
+    let searchTimeout;
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(loadLeads, 300);
+    }
+
+    async function loadLeads() {
+      const search = document.getElementById('searchInput').value;
+      const status = document.getElementById('statusFilter').value;
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (status) params.set('status', status);
+
+      try {
+        const data = await API.getLeads(params.toString());
+        const tbody = document.getElementById('leadsTableBody');
+
+        if (data.leads.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:3rem;color:#71717a;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No leads found</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.leads.map(lead => `
+          <tr>
+            <td><strong>${lead.name}</strong></td>
+            <td>${lead.email}</td>
+            <td>${lead.company || '—'}</td>
+            <td>${lead.service || '—'}</td>
+            <td>${lead.source || '—'}</td>
+            <td>
+              <select class="status-select" onchange="updateLead(${lead.id}, this.value)">
+                ${['new','contacted','converted','closed'].map(s => `<option value="${s}" ${lead.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+            </td>
+            <td style="white-space:nowrap;">${new Date(lead.created_at).toLocaleDateString()}</td>
+            <td>
+              <div class="table-actions">
+                <button class="btn-icon" title="View message" onclick="alert('${(lead.message || 'No message').replace(/'/g, "\\'")}')"><i class="fas fa-eye"></i></button>
+                <button class="btn-icon danger" title="Delete" onclick="deleteLead(${lead.id})"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Load leads error:', err);
+      }
+    }
+
+    async function updateLead(id, status) {
+      try {
+        await API.updateLeadStatus(id, status);
+        showToast('Status updated', 'success');
+      } catch (err) {
+        showToast('Failed to update', 'error');
+        loadLeads();
+      }
+    }
+
+    async function deleteLead(id) {
+      if (!confirm('Delete this lead?')) return;
+      try {
+        await API.deleteLead(id);
+        showToast('Lead deleted', 'success');
+        loadLeads();
+      } catch (err) {
+        showToast('Failed to delete', 'error');
+      }
+    }
+
+    loadLeads();
+  </script>
+</body>
+</html>

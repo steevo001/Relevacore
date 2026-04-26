@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading... | RelevaCore Insights</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0b0c10; color: #e4e4e7; line-height: 1.5; overflow-x: hidden; }
+    .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 40%, #1f1b3a 0%, #0b0c10 70%); z-index: -2; }
+    .grid-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 0; flex-wrap: wrap; gap: 1rem; }
+    .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg,#c084fc,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .logo i { background: none; -webkit-text-fill-color: #a855f7; font-size: 2.2rem; }
+    .nav-links { display: flex; gap: 2.5rem; font-weight: 500; }
+    .nav-links a { color: #d4d4d8; text-decoration: none; position: relative; padding-bottom: 6px; transition: color 0.3s; }
+    .nav-links a::after { content: ''; position: absolute; width: 0%; height: 2px; bottom: 0; left: 0; background: #a855f7; transition: width 0.3s ease; }
+    .nav-links a:hover { color: #f5f5f5; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active::after { width: 100%; }
+    .cta-button { background: #a855f7; border: none; padding: 0.75rem 1.8rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(168,85,247,0.4); display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-size: 1rem; }
+    .cta-button:hover { background: #9333ea; }
+    footer { text-align: center; padding: 2.5rem 0; color: #71717a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: #a1a1aa; text-decoration: none; font-size: 0.9rem; margin-top: 6rem; transition: color 0.3s; }
+    .back-link:hover { color: #c084fc; }
+    .post-header { margin: 2rem 0 3rem; max-width: 760px; margin-left: auto; margin-right: auto; }
+    .post-header .post-meta { display: flex; gap: 1.5rem; color: #71717a; font-size: 0.85rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .post-header h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; background: linear-gradient(to right, #f0e7ff, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+    .post-header .post-excerpt { font-size: 1.15rem; color: #a1a1aa; line-height: 1.7; }
+    .post-divider { width: 60px; height: 3px; background: #a855f7; border-radius: 3px; margin: 2rem auto; }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <div class="grid-overlay"></div>
+  <div class="container">
+    <header>
+      <a href="/" class="logo"><i class="fas fa-cube"></i> RelevaCore</a>
+      <div class="nav-links">
+        <a href="/work">Work</a>
+        <a href="/services">Services</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/insights" class="active">Insights</a>
+      </div>
+      <a href="/#pricing" class="cta-button"><i class="fas fa-comment-dots"></i> Let's talk</a>
+    </header>
+
+    <a href="/insights" class="back-link"><i class="fas fa-arrow-left"></i> Back to Insights</a>
+
+    <div id="postContainer">
+      <div class="post-header">
+        <div class="skeleton" style="height: 20px; width: 200px; margin-bottom: 1rem;"></div>
+        <div class="skeleton" style="height: 48px; width: 100%; margin-bottom: 0.5rem;"></div>
+        <div class="skeleton" style="height: 48px; width: 80%; margin-bottom: 1rem;"></div>
+        <div class="skeleton" style="height: 60px; width: 100%;"></div>
+      </div>
+      <div class="blog-post-content">
+        <div class="skeleton" style="height: 200px; width: 100%;"></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 RelevaCore — Brand agency for the next generation.</p>
+    </footer>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    async function loadPost() {
+      const slug = window.location.pathname.split('/insights/')[1];
+      if (!slug) {
+        window.location.href = '/insights';
+        return;
+      }
+
+      try {
+        const data = await API.getPost(slug);
+        const post = data.post;
+
+        document.title = `${post.title} | RelevaCore Insights`;
+
+        document.getElementById('postContainer').innerHTML = `
+          <div class="post-header">
+            <div class="post-meta">
+              <span><i class="fas fa-user"></i> ${post.author}</span>
+              <span><i class="fas fa-clock"></i> ${formatDate(post.published_at)}</span>
+              <span><i class="fas fa-tag"></i> ${post.category}</span>
+              <span><i class="fas fa-eye"></i> ${post.views} views</span>
+            </div>
+            <h1>${post.title}</h1>
+            <p class="post-excerpt">${post.excerpt || ''}</p>
+          </div>
+          <div class="post-divider"></div>
+          <div class="blog-post-content">
+            ${post.content}
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('postContainer').innerHTML = `
+          <div class="empty-state" style="margin-top: 4rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Post not found</h3>
+            <p>This article may have been moved or deleted.</p>
+            <a href="/insights" class="cta-button" style="margin-top: 1.5rem;">Browse all insights</a>
+          </div>
+        `;
+      }
+    }
+
+    loadPost();
+  </script>
+</body>
+</html>

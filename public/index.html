@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RelevaCore | Brand Marketing Agency</title>
+  <meta name="description" content="We craft marketing strategies and digital identities that make your brand impossible to ignore. Precision, relevance, core.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #0b0c10; color: #e4e4e7; line-height: 1.5; overflow-x: hidden;
+    }
+    .animated-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 30% 40%, #1f1b3a 0%, #0b0c10 70%); z-index: -2;
+    }
+    .grid-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 50px 50px; z-index: -1; pointer-events: none;
+    }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes glowPulse { 0% { box-shadow: 0 0 15px rgba(168,85,247,0.3); } 50% { box-shadow: 0 0 30px rgba(168,85,247,0.6); } 100% { box-shadow: 0 0 15px rgba(168,85,247,0.3); } }
+    .reveal { animation: fadeUp 0.8s cubic-bezier(0.23,1,0.32,1) forwards; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 0; flex-wrap: wrap; gap: 1rem; }
+    .logo { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg,#c084fc,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .logo i { background: none; -webkit-text-fill-color: #a855f7; font-size: 2.2rem; }
+    .nav-links { display: flex; gap: 2.5rem; font-weight: 500; color: #d4d4d8; }
+    .nav-links a { color: #d4d4d8; text-decoration: none; position: relative; padding-bottom: 6px; transition: color 0.3s; }
+    .nav-links a::after { content: ''; position: absolute; width: 0%; height: 2px; bottom: 0; left: 0; background: #a855f7; transition: width 0.3s ease; }
+    .nav-links a:hover { color: #f5f5f5; }
+    .nav-links a:hover::after { width: 100%; }
+    .cta-button { background: #a855f7; border: none; padding: 0.75rem 1.8rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(168,85,247,0.4); letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-size: 1rem; }
+    .cta-button:hover { background: #9333ea; box-shadow: 0 8px 28px rgba(168,85,247,0.7); transform: translateY(-2px); }
+    .hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin: 3rem 0 5rem; gap: 2.5rem; }
+    .hero-text { flex: 1 1 500px; }
+    .hero-text h1 { font-size: 3.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; background: linear-gradient(to right,#f0e7ff,#c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-text p { font-size: 1.25rem; color: #a1a1aa; margin-bottom: 2.2rem; max-width: 550px; }
+    .hero-visual { flex: 1 1 400px; display: flex; justify-content: center; animation: float 4s ease-in-out infinite; }
+    .hero-visual i { font-size: 13rem; color: #a855f7; filter: drop-shadow(0 0 30px rgba(168,85,247,0.5)); opacity: 0.9; }
+    .section-title { font-size: 2.5rem; font-weight: 700; margin: 4rem 0 2.5rem; text-align: center; color: #f1f1f1; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 2rem; margin-bottom: 4rem; }
+    .service-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(168,85,247,0.15); border-radius: 2rem; padding: 2.2rem 1.5rem; transition: all 0.4s ease; text-align: center; }
+    .service-card:hover { transform: translateY(-12px); border-color: #a855f7; background: rgba(168,85,247,0.08); box-shadow: 0 20px 35px rgba(168,85,247,0.2); }
+    .service-card i { font-size: 2.8rem; color: #c084fc; margin-bottom: 1.5rem; }
+    .service-card h3 { font-size: 1.5rem; margin-bottom: 0.8rem; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 2rem; margin: 2rem 0 4rem; }
+    .pricing-card { background: rgba(20,20,28,0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); border-radius: 2.5rem; padding: 2.5rem 1.8rem; transition: all 0.4s ease; position: relative; display: flex; flex-direction: column; }
+    .pricing-card.popular { border-color: #a855f7; background: rgba(168,85,247,0.08); animation: glowPulse 3s infinite; transform: scale(1.02); }
+    .pricing-card:hover { border-color: #a855f7; box-shadow: 0 20px 30px rgba(0,0,0,0.5); }
+    .badge { position: absolute; top: -12px; right: 25px; background: #a855f7; color: white; padding: 0.3rem 1.2rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+    .price { font-size: 3rem; font-weight: 800; margin: 1rem 0 0.5rem; color: #f5f5f5; }
+    .price span { font-size: 1rem; font-weight: 400; color: #a1a1aa; }
+    .pricing-features { list-style: none; margin: 2rem 0; flex: 1; }
+    .pricing-features li { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.7rem; color: #d4d4d8; }
+    .pricing-features i { color: #a855f7; font-size: 1.1rem; }
+    .btn-outline { background: transparent; border: 1.5px solid #a855f7; color: #f0e7ff; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; text-align: center; width: 100%; font-size: 1rem; }
+    .btn-outline:hover { background: #a855f7; color: white; }
+    .btn-solid { background: #a855f7; border: none; color: white; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+    .btn-solid:hover { background: #7e22ce; }
+    footer { text-align: center; padding: 2.5rem 0; color: #71717a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem; }
+    footer a { color: #a1a1aa; text-decoration: none; transition: color 0.3s; font-size: 1.2rem; }
+    footer a:hover { color: #c084fc; }
+    .footer-content { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .footer-newsletter { margin-top: 0.5rem; }
+    .footer-newsletter p { color: #a1a1aa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    @media (max-width: 700px) {
+      .hero-text h1 { font-size: 2.8rem; }
+      .nav-links { gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="reveal">
+      <a href="/" class="logo">
+        <i class="fas fa-cube"></i> RelevaCore
+      </a>
+      <div class="nav-links">
+        <a href="/work">Work</a>
+        <a href="/services">Services</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/insights">Insights</a>
+      </div>
+      <button class="cta-button" onclick="openModal('contactModal')"><i class="fas fa-comment-dots"></i> Let's talk</button>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text reveal">
+        <h1>Brands that <br>resonate & convert</h1>
+        <p>We craft marketing strategies and digital identities that make your brand impossible to ignore. Precision, relevance, core.</p>
+        <button class="cta-button" style="padding: 0.9rem 2.5rem;" onclick="openModal('contactModal')"><i class="fas fa-rocket"></i> Start your project</button>
+      </div>
+      <div class="hero-visual reveal">
+        <i class="fas fa-fingerprint"></i>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <h2 class="section-title reveal">Our core expertise</h2>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <i class="fas fa-bullseye"></i>
+        <h3>Brand Strategy</h3>
+        <p>Positioning, messaging, and audience analysis that builds relevance.</p>
+      </div>
+      <div class="service-card reveal">
+        <i class="fas fa-paint-brush"></i>
+        <h3>Creative Design</h3>
+        <p>Visual identities, motion graphics, and web design with impact.</p>
+      </div>
+      <div class="service-card reveal">
+        <i class="fas fa-chart-line"></i>
+        <h3>Performance Marketing</h3>
+        <p>Data-driven campaigns across social, search & programmatic.</p>
+      </div>
+      <div class="service-card reveal">
+        <i class="fas fa-video"></i>
+        <h3>Content Production</h3>
+        <p>High-quality video, copywriting, and storytelling assets.</p>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <h2 class="section-title reveal" id="pricing">Pricing plans</h2>
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="pricing-card reveal">
+        <h3 style="font-size: 1.7rem; margin-bottom: 0.5rem;">Starter</h3>
+        <p style="color: #a1a1aa;">For emerging brands</p>
+        <div class="price">$2.4k<span>/month</span></div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check-circle"></i> Brand audit & strategy</li>
+          <li><i class="fas fa-check-circle"></i> Social media management (2 channels)</li>
+          <li><i class="fas fa-check-circle"></i> Monthly content calendar</li>
+          <li><i class="fas fa-check-circle"></i> Basic analytics report</li>
+        </ul>
+        <button class="btn-outline" onclick="openPricingModal('Starter')">Get started</button>
+      </div>
+
+      <!-- Growth (popular) -->
+      <div class="pricing-card popular reveal">
+        <span class="badge">MOST POPULAR</span>
+        <h3 style="font-size: 1.7rem; margin-bottom: 0.5rem;">Growth</h3>
+        <p style="color: #a1a1aa;">Scaling brands</p>
+        <div class="price">$5.8k<span>/month</span></div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check-circle"></i> Everything in Starter</li>
+          <li><i class="fas fa-check-circle"></i> Performance ads (Meta/Google)</li>
+          <li><i class="fas fa-check-circle"></i> Email marketing flows</li>
+          <li><i class="fas fa-check-circle"></i> Creative video (2/mo)</li>
+          <li><i class="fas fa-check-circle"></i> Dedicated strategist</li>
+        </ul>
+        <button class="btn-solid" style="width:100%;" onclick="openPricingModal('Growth')">Choose Growth</button>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card reveal">
+        <h3 style="font-size: 1.7rem; margin-bottom: 0.5rem;">Enterprise</h3>
+        <p style="color: #a1a1aa;">Full-funnel dominance</p>
+        <div class="price">$12k+<span>/month</span></div>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check-circle"></i> All Growth features</li>
+          <li><i class="fas fa-check-circle"></i> CRO & landing pages</li>
+          <li><i class="fas fa-check-circle"></i> Influencer partnerships</li>
+          <li><i class="fas fa-check-circle"></i> Advanced BI dashboard</li>
+          <li><i class="fas fa-check-circle"></i> 24/7 priority support</li>
+        </ul>
+        <button class="btn-outline" onclick="openPricingModal('Enterprise')">Contact sales</button>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="text-align: center; margin: 3rem 0 2rem;" class="reveal">
+      <p style="font-size: 1.3rem; color: #cbd5e1; margin-bottom: 1.5rem;">Not sure which plan fits? Let's tailor a solution.</p>
+      <button class="cta-button" style="font-size: 1.1rem;" onclick="openModal('bookingModal')"><i class="fas fa-calendar-alt"></i> Book a free consultation</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p>© 2025 RelevaCore — Brand agency for the next generation.</p>
+        <div class="footer-newsletter">
+          <p>Stay in the loop — insights delivered to your inbox.</p>
+          <form class="newsletter-form" id="newsletterForm" onsubmit="handleNewsletter(event)">
+            <input type="email" id="newsletterEmail" placeholder="your@email.com" required>
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+        <div style="display: flex; gap: 1.5rem; color: #a1a1aa;">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-x-twitter"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ═══════════ CONTACT MODAL ═══════════ -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal-content" style="position: relative;">
+      <button class="modal-close" onclick="closeModal('contactModal')"><i class="fas fa-times"></i></button>
+      <h2>Let's build something great</h2>
+      <p class="modal-subtitle">Tell us about your project and we'll get back within 24 hours.</p>
+      <form id="contactForm" onsubmit="handleContact(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactName">Name *</label>
+            <input type="text" id="contactName" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label for="contactEmail">Email *</label>
+            <input type="email" id="contactEmail" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactPhone">Phone</label>
+            <input type="tel" id="contactPhone" placeholder="+1 (234) 567-890">
+          </div>
+          <div class="form-group">
+            <label for="contactCompany">Company</label>
+            <input type="text" id="contactCompany" placeholder="Your company">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contactService">Service interested in</label>
+          <select id="contactService">
+            <option value="">Select a service...</option>
+            <option value="Brand Strategy">Brand Strategy</option>
+            <option value="Creative Design">Creative Design</option>
+            <option value="Performance Marketing">Performance Marketing</option>
+            <option value="Content Production">Content Production</option>
+            <option value="Full Package">Full Package</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contactMessage">Tell us about your project</label>
+          <textarea id="contactMessage" placeholder="What are your goals? What challenges are you facing?"></textarea>
+        </div>
+        <button type="submit" class="form-submit" id="contactSubmitBtn">
+          <span class="spinner"></span>
+          <span class="btn-text"><i class="fas fa-paper-plane"></i> Send message</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════ PRICING MODAL ═══════════ -->
+  <div class="modal-overlay" id="pricingModal">
+    <div class="modal-content" style="position: relative;">
+      <button class="modal-close" onclick="closeModal('pricingModal')"><i class="fas fa-times"></i></button>
+      <h2>Get started with <span id="selectedPlan">Growth</span></h2>
+      <p class="modal-subtitle">Fill in your details and we'll set everything up for you.</p>
+      <form id="pricingForm" onsubmit="handlePricing(event)">
+        <input type="hidden" id="pricingPlan" value="">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pricingName">Name *</label>
+            <input type="text" id="pricingName" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label for="pricingEmail">Email *</label>
+            <input type="email" id="pricingEmail" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pricingPhone">Phone</label>
+            <input type="tel" id="pricingPhone" placeholder="+1 (234) 567-890">
+          </div>
+          <div class="form-group">
+            <label for="pricingCompany">Company</label>
+            <input type="text" id="pricingCompany" placeholder="Your company">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="pricingMessage">Anything else we should know?</label>
+          <textarea id="pricingMessage" placeholder="Tell us about your brand, goals, timeline..."></textarea>
+        </div>
+        <button type="submit" class="form-submit" id="pricingSubmitBtn">
+          <span class="spinner"></span>
+          <span class="btn-text"><i class="fas fa-arrow-right"></i> Get started</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════ BOOKING MODAL ═══════════ -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal-content" style="position: relative;">
+      <button class="modal-close" onclick="closeModal('bookingModal')"><i class="fas fa-times"></i></button>
+      <h2>Book a free consultation</h2>
+      <p class="modal-subtitle">30-minute strategy call with our team. Zero obligation.</p>
+      <form id="bookingForm" onsubmit="handleBooking(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bookingName">Name *</label>
+            <input type="text" id="bookingName" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label for="bookingEmail">Email *</label>
+            <input type="email" id="bookingEmail" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bookingDate">Preferred date</label>
+            <input type="date" id="bookingDate">
+          </div>
+          <div class="form-group">
+            <label for="bookingTime">Preferred time</label>
+            <select id="bookingTime">
+              <option value="">Select time...</option>
+              <option value="9:00 AM">9:00 AM</option>
+              <option value="10:00 AM">10:00 AM</option>
+              <option value="11:00 AM">11:00 AM</option>
+              <option value="12:00 PM">12:00 PM</option>
+              <option value="1:00 PM">1:00 PM</option>
+              <option value="2:00 PM">2:00 PM</option>
+              <option value="3:00 PM">3:00 PM</option>
+              <option value="4:00 PM">4:00 PM</option>
+              <option value="5:00 PM">5:00 PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bookingTopic">What would you like to discuss?</label>
+          <select id="bookingTopic">
+            <option value="">Select a topic...</option>
+            <option value="Brand Strategy">Brand Strategy</option>
+            <option value="Rebranding">Rebranding</option>
+            <option value="Marketing Campaign">Marketing Campaign</option>
+            <option value="Social Media">Social Media</option>
+            <option value="Content Production">Content Production</option>
+            <option value="General Inquiry">General Inquiry</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookingMessage">Additional details</label>
+          <textarea id="bookingMessage" placeholder="Share any context that will help us prepare for the call..."></textarea>
+        </div>
+        <button type="submit" class="form-submit" id="bookingSubmitBtn">
+          <span class="spinner"></span>
+          <span class="btn-text"><i class="fas fa-calendar-check"></i> Book consultation</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // Reveal animations
+    (function() {
+      const revealElements = document.querySelectorAll('.reveal');
+      revealElements.forEach((el) => {
+        if (el.closest('.services-grid') || el.closest('.pricing-grid')) {
+          const parent = el.closest('.services-grid') || el.closest('.pricing-grid');
+          const children = Array.from(parent.children);
+          const idx = children.indexOf(el);
+          el.style.animationDelay = (idx * 0.1) + 's';
+        } else {
+          el.style.animationDelay = '0.05s';
+        }
+      });
+    })();
+
+    // Contact form
+    async function handleContact(e) {
+      e.preventDefault();
+      const btn = document.getElementById('contactSubmitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        await API.submitLead({
+          name: document.getElementById('contactName').value,
+          email: document.getElementById('contactEmail').value,
+          phone: document.getElementById('contactPhone').value,
+          company: document.getElementById('contactCompany').value,
+          service: document.getElementById('contactService').value,
+          message: document.getElementById('contactMessage').value,
+          source: 'contact_form'
+        });
+        showToast('Message sent! We\'ll get back to you within 24 hours. 🚀', 'success');
+        closeModal('contactModal');
+        document.getElementById('contactForm').reset();
+      } catch (err) {
+        showToast(err.error || 'Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // Pricing form
+    function openPricingModal(plan) {
+      document.getElementById('selectedPlan').textContent = plan;
+      document.getElementById('pricingPlan').value = plan;
+      openModal('pricingModal');
+    }
+
+    async function handlePricing(e) {
+      e.preventDefault();
+      const btn = document.getElementById('pricingSubmitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        await API.submitPricingInquiry({
+          name: document.getElementById('pricingName').value,
+          email: document.getElementById('pricingEmail').value,
+          phone: document.getElementById('pricingPhone').value,
+          company: document.getElementById('pricingCompany').value,
+          plan: document.getElementById('pricingPlan').value,
+          message: document.getElementById('pricingMessage').value
+        });
+        showToast('Thanks for your interest! We\'ll reach out within 24 hours. 🎉', 'success');
+        closeModal('pricingModal');
+        document.getElementById('pricingForm').reset();
+      } catch (err) {
+        showToast(err.error || 'Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // Booking form
+    async function handleBooking(e) {
+      e.preventDefault();
+      const btn = document.getElementById('bookingSubmitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        await API.bookConsultation({
+          name: document.getElementById('bookingName').value,
+          email: document.getElementById('bookingEmail').value,
+          preferred_date: document.getElementById('bookingDate').value,
+          preferred_time: document.getElementById('bookingTime').value,
+          topic: document.getElementById('bookingTopic').value,
+          message: document.getElementById('bookingMessage').value
+        });
+        showToast('Consultation booked! Check your email for confirmation. ✅', 'success');
+        closeModal('bookingModal');
+        document.getElementById('bookingForm').reset();
+      } catch (err) {
+        showToast(err.error || 'Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // Newsletter
+    async function handleNewsletter(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('newsletterEmail');
+      try {
+        await API.subscribe(emailInput.value);
+        showToast('Successfully subscribed! 🎉', 'success');
+        emailInput.value = '';
+      } catch (err) {
+        showToast(err.error || 'Something went wrong.', 'error');
+      }
+    }
+
+    // Set min date for booking
+    const bookingDate = document.getElementById('bookingDate');
+    if (bookingDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      bookingDate.min = tomorrow.toISOString().split('T')[0];
+    }
+  </script>
+</body>
+</html>

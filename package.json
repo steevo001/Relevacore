@@ -1,0 +1,30 @@
+{
+  "name": "relevacore-backend",
+  "version": "1.0.0",
+  "description": "RelevaCore Brand Marketing Agency - Full-stack Backend",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "node database/init.js",
+    "init-db": "node database/init.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "sql.js": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "stripe": "^17.4.0",
+    "uuid": "^11.0.3"
+  }
+}

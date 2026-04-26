@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Work | RelevaCore</title>
+  <meta name="description" content="Explore our portfolio of brand transformations, marketing campaigns, and creative projects that drive real results.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0b0c10; color: #e4e4e7; line-height: 1.5; overflow-x: hidden; }
+    .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 40%, #1f1b3a 0%, #0b0c10 70%); z-index: -2; }
+    .grid-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 0; flex-wrap: wrap; gap: 1rem; }
+    .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg,#c084fc,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .logo i { background: none; -webkit-text-fill-color: #a855f7; font-size: 2.2rem; }
+    .nav-links { display: flex; gap: 2.5rem; font-weight: 500; }
+    .nav-links a { color: #d4d4d8; text-decoration: none; position: relative; padding-bottom: 6px; transition: color 0.3s; }
+    .nav-links a::after { content: ''; position: absolute; width: 0%; height: 2px; bottom: 0; left: 0; background: #a855f7; transition: width 0.3s ease; }
+    .nav-links a:hover { color: #f5f5f5; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #c084fc; }
+    .nav-links a.active::after { width: 100%; }
+    .cta-button { background: #a855f7; border: none; padding: 0.75rem 1.8rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(168,85,247,0.4); display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-size: 1rem; }
+    .cta-button:hover { background: #9333ea; box-shadow: 0 8px 28px rgba(168,85,247,0.7); transform: translateY(-2px); }
+    footer { text-align: center; padding: 2.5rem 0; color: #71717a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem; }
+
+    /* Portfolio Detail Modal */
+    .detail-modal .modal-content { max-width: 700px; }
+    .detail-client { color: #a1a1aa; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .detail-description { color: #d4d4d8; line-height: 1.8; margin-bottom: 1.5rem; }
+    .detail-results { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); border-radius: 14px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.7rem; color: #4ade80; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <div class="grid-overlay"></div>
+  <div class="container">
+    <header>
+      <a href="/" class="logo"><i class="fas fa-cube"></i> RelevaCore</a>
+      <div class="nav-links">
+        <a href="/work" class="active">Work</a>
+        <a href="/services">Services</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/insights">Insights</a>
+      </div>
+      <a href="/#pricing" class="cta-button"><i class="fas fa-comment-dots"></i> Let's talk</a>
+    </header>
+
+    <div class="page-header">
+      <h1>Our Work</h1>
+      <p>Real results for real brands. Here's what happens when strategy meets execution.</p>
+    </div>
+
+    <div class="filter-chips" id="filterChips">
+      <button class="filter-chip active" data-category="">All</button>
+      <button class="filter-chip" data-category="branding">Branding</button>
+      <button class="filter-chip" data-category="strategy">Strategy</button>
+      <button class="filter-chip" data-category="marketing">Marketing</button>
+      <button class="filter-chip" data-category="content">Content</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+
+    <footer>
+      <p>© 2025 RelevaCore — Brand agency for the next generation.</p>
+    </footer>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay detail-modal" id="detailModal">
+    <div class="modal-content" style="position: relative;">
+      <button class="modal-close" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentCategory = '';
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentCategory = chip.dataset.category;
+        loadPortfolio();
+      });
+    });
+
+    async function loadPortfolio() {
+      const grid = document.getElementById('portfolioGrid');
+      grid.innerHTML = '<div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>';
+
+      try {
+        const params = currentCategory ? `category=${currentCategory}` : '';
+        const data = await API.getPortfolio(params);
+
+        if (data.items.length === 0) {
+          grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No projects yet</h3><p>Check back soon for our latest work.</p></div>';
+          return;
+        }
+
+        grid.innerHTML = data.items.map(item => `
+          <div class="portfolio-card" onclick="showDetail(${item.id})" style="animation: fadeUp 0.6s ease forwards; opacity: 0;">
+            <span class="card-category">${item.category || 'project'}</span>
+            <h3>${item.title}</h3>
+            <p class="card-client">${item.client || ''}</p>
+            <p>${item.description || ''}</p>
+            ${item.results ? `<div class="card-results"><i class="fas fa-chart-line"></i> ${item.results}</div>` : ''}
+          </div>
+        `).join('');
+
+        // Stagger animations
+        grid.querySelectorAll('.portfolio-card').forEach((card, i) => {
+          card.style.animationDelay = (i * 0.1) + 's';
+        });
+      } catch (err) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Failed to load</h3><p>Please try refreshing the page.</p></div>';
+      }
+    }
+
+    async function showDetail(id) {
+      try {
+        const data = await API.getPortfolioItem(id);
+        const item = data.item;
+        document.getElementById('detailContent').innerHTML = `
+          <span class="card-category" style="margin-bottom: 1rem; display: inline-block;">${item.category}</span>
+          <h2 style="margin-bottom: 0.3rem;">${item.title}</h2>
+          <p class="detail-client">${item.client ? `Client: ${item.client}` : ''}</p>
+          <p class="detail-description">${item.long_description || item.description || ''}</p>
+          ${item.results ? `<div class="detail-results"><i class="fas fa-trophy"></i> ${item.results}</div>` : ''}
+        `;
+        openModal('detailModal');
+      } catch (err) {
+        showToast('Failed to load project details.', 'error');
+      }
+    }
+
+    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    loadPortfolio();
+  </script>
+</body>
+</html>

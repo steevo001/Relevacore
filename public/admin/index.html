@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | RelevaCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #0b0c10; color: #e4e4e7; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 40%, #1f1b3a 0%, #0b0c10 70%); z-index: -2; }
+    .grid-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+    .login-container { width: 100%; max-width: 420px; padding: 1.5rem; }
+    .login-card { background: rgba(20,20,28,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(168,85,247,0.15); border-radius: 2.5rem; padding: 3rem 2.5rem; }
+    .login-logo { text-align: center; margin-bottom: 2rem; }
+    .login-logo .logo-icon { font-size: 3rem; color: #a855f7; margin-bottom: 0.8rem; }
+    .login-logo h1 { font-size: 1.8rem; background: linear-gradient(135deg,#c084fc,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .login-logo p { color: #71717a; font-size: 0.9rem; margin-top: 0.5rem; }
+    .login-error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); border-radius: 12px; padding: 0.75rem 1rem; color: #f87171; font-size: 0.85rem; margin-bottom: 1rem; display: none; align-items: center; gap: 0.5rem; }
+    .login-error.show { display: flex; }
+    .back-home { display: block; text-align: center; margin-top: 1.5rem; color: #71717a; font-size: 0.85rem; text-decoration: none; transition: color 0.3s; }
+    .back-home:hover { color: #c084fc; }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon"><i class="fas fa-cube"></i></div>
+        <h1>RelevaCore</h1>
+        <p>Admin Dashboard</p>
+      </div>
+
+      <div class="login-error" id="loginError">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorMessage"></span>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="admin@relevacore.com" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="form-submit" id="loginBtn">
+          <span class="spinner"></span>
+          <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Sign in</span>
+        </button>
+      </form>
+
+      <a href="/" class="back-home"><i class="fas fa-arrow-left"></i> Back to website</a>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (API.isLoggedIn()) {
+      window.location.href = '/admin/dashboard';
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+      errorEl.classList.remove('show');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const data = await API.login(
+          document.getElementById('email').value,
+          document.getElementById('password').value
+        );
+        API.setToken(data.token);
+        window.location.href = '/admin/dashboard';
+      } catch (err) {
+        document.getElementById('errorMessage').textContent = err.error || 'Login failed. Please try again.';
+        errorEl.classList.add('show');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

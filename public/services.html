@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | RelevaCore</title>
+  <meta name="description" content="Brand strategy, creative design, performance marketing, and content production services from RelevaCore.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0b0c10; color: #e4e4e7; line-height: 1.5; overflow-x: hidden; }
+    .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 40%, #1f1b3a 0%, #0b0c10 70%); z-index: -2; }
+    .grid-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 0; flex-wrap: wrap; gap: 1rem; }
+    .logo { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg,#c084fc,#a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+    .logo i { background: none; -webkit-text-fill-color: #a855f7; font-size: 2.2rem; }
+    .nav-links { display: flex; gap: 2.5rem; font-weight: 500; }
+    .nav-links a { color: #d4d4d8; text-decoration: none; position: relative; padding-bottom: 6px; transition: color 0.3s; }
+    .nav-links a::after { content: ''; position: absolute; width: 0%; height: 2px; bottom: 0; left: 0; background: #a855f7; transition: width 0.3s ease; }
+    .nav-links a:hover { color: #f5f5f5; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: #c084fc; }
+    .nav-links a.active::after { width: 100%; }
+    .cta-button { background: #a855f7; border: none; padding: 0.75rem 1.8rem; border-radius: 40px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(168,85,247,0.4); display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; font-size: 1rem; }
+    .cta-button:hover { background: #9333ea; box-shadow: 0 8px 28px rgba(168,85,247,0.7); transform: translateY(-2px); }
+    footer { text-align: center; padding: 2.5rem 0; color: #71717a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem; }
+
+    .services-detail-grid { display: grid; gap: 3rem; margin-bottom: 4rem; }
+    .service-detail {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+      background: rgba(20,20,28,0.5); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 2.5rem; padding: 3rem;
+      transition: border-color 0.4s;
+    }
+    .service-detail:hover { border-color: rgba(168,85,247,0.3); }
+    .service-detail:nth-child(even) { direction: rtl; }
+    .service-detail:nth-child(even) > * { direction: ltr; }
+    .service-detail .service-icon { text-align: center; }
+    .service-detail .service-icon i { font-size: 6rem; color: #a855f7; filter: drop-shadow(0 0 25px rgba(168,85,247,0.4)); }
+    .service-detail h3 { font-size: 1.8rem; color: #f5f5f5; margin-bottom: 1rem; }
+    .service-detail p { color: #a1a1aa; line-height: 1.8; margin-bottom: 1.2rem; }
+    .service-detail ul { list-style: none; margin-bottom: 1.5rem; }
+    .service-detail ul li { color: #d4d4d8; padding: 0.4rem 0; display: flex; align-items: center; gap: 0.6rem; }
+    .service-detail ul li i { color: #a855f7; font-size: 0.9rem; }
+
+    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 800px) {
+      .service-detail { grid-template-columns: 1fr; text-align: center; }
+      .service-detail:nth-child(even) { direction: ltr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+  <div class="grid-overlay"></div>
+  <div class="container">
+    <header>
+      <a href="/" class="logo"><i class="fas fa-cube"></i> RelevaCore</a>
+      <div class="nav-links">
+        <a href="/work">Work</a>
+        <a href="/services" class="active">Services</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/insights">Insights</a>
+      </div>
+      <a href="/#pricing" class="cta-button"><i class="fas fa-comment-dots"></i> Let's talk</a>
+    </header>
+
+    <div class="page-header">
+      <h1>Our Services</h1>
+      <p>End-to-end brand and marketing solutions designed to make your brand impossible to ignore.</p>
+    </div>
+
+    <div class="services-detail-grid">
+      <div class="service-detail" style="animation: fadeUp 0.8s ease forwards;">
+        <div>
+          <h3>Brand Strategy</h3>
+          <p>We build the strategic foundation your brand needs to stand out in a crowded market. From audience research to competitive analysis, every decision is backed by data.</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Brand audit & positioning</li>
+            <li><i class="fas fa-check"></i> Audience personas & segmentation</li>
+            <li><i class="fas fa-check"></i> Messaging framework & tone of voice</li>
+            <li><i class="fas fa-check"></i> Competitive landscape analysis</li>
+            <li><i class="fas fa-check"></i> Go-to-market strategy</li>
+          </ul>
+        </div>
+        <div class="service-icon"><i class="fas fa-bullseye"></i></div>
+      </div>
+
+      <div class="service-detail" style="animation: fadeUp 0.8s ease forwards; animation-delay: 0.1s;">
+        <div>
+          <h3>Creative Design</h3>
+          <p>Visual identities that captivate. We design everything from logos to full brand systems, ensuring consistency and impact across every touchpoint.</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Logo & visual identity design</li>
+            <li><i class="fas fa-check"></i> Brand guidelines & style systems</li>
+            <li><i class="fas fa-check"></i> Web & app UI/UX design</li>
+            <li><i class="fas fa-check"></i> Motion graphics & animation</li>
+            <li><i class="fas fa-check"></i> Packaging & print design</li>
+          </ul>
+        </div>
+        <div class="service-icon"><i class="fas fa-paint-brush"></i></div>
+      </div>
+
+      <div class="service-detail" style="animation: fadeUp 0.8s ease forwards; animation-delay: 0.2s;">
+        <div>
+          <h3>Performance Marketing</h3>
+          <p>Data-driven campaigns that deliver measurable ROI. We optimize spend across channels to maximize every dollar of your marketing budget.</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Meta & Google Ads management</li>
+            <li><i class="fas fa-check"></i> Email marketing & automation</li>
+            <li><i class="fas fa-check"></i> Conversion rate optimization (CRO)</li>
+            <li><i class="fas fa-check"></i> Analytics & attribution modeling</li>
+            <li><i class="fas fa-check"></i> Landing page design & testing</li>
+          </ul>
+        </div>
+        <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+      </div>
+
+      <div class="service-detail" style="animation: fadeUp 0.8s ease forwards; animation-delay: 0.3s;">
+        <div>
+          <h3>Content Production</h3>
+          <p>High-quality content that tells your brand story. From video production to copywriting, we create assets that engage and convert.</p>
+          <ul>
+            <li><i class="fas fa-check"></i> Video production & editing</li>
+            <li><i class="fas fa-check"></i> Social media content creation</li>
+            <li><i class="fas fa-check"></i> Blog & article writing</li>
+            <li><i class="fas fa-check"></i> Photography & visual content</li>
+            <li><i class="fas fa-check"></i> Influencer partnership management</li>
+          </ul>
+        </div>
+        <div class="service-icon"><i class="fas fa-video"></i></div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin: 2rem 0 3rem;">
+      <p style="font-size: 1.2rem; color: #cbd5e1; margin-bottom: 1.5rem;">Ready to transform your brand?</p>
+      <a href="/#pricing" class="cta-button" style="font-size: 1.1rem;"><i class="fas fa-rocket"></i> View pricing</a>
+    </div>
+
+    <footer>
+      <p>© 2025 RelevaCore — Brand agency for the next generation.</p>
+    </footer>
+  </div>
+</body>
+</html>

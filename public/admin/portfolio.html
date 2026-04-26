@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio | RelevaCore Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-logo"><i class="fas fa-cube"></i> <span>RelevaCore</span></a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item"><i class="fas fa-th-large"></i> <span>Dashboard</span></a>
+        <a href="/admin/leads" class="nav-item"><i class="fas fa-user-plus"></i> <span>Leads</span></a>
+        <a href="/admin/consultations" class="nav-item"><i class="fas fa-calendar-check"></i> <span>Consultations</span></a>
+        <a href="/admin/blog" class="nav-item"><i class="fas fa-edit"></i> <span>Blog</span></a>
+        <a href="/admin/portfolio" class="nav-item active"><i class="fas fa-briefcase"></i> <span>Portfolio</span></a>
+        <a href="/admin/newsletter" class="nav-item"><i class="fas fa-envelope"></i> <span>Newsletter</span></a>
+        <div class="nav-divider"></div>
+        <a href="/" class="nav-item"><i class="fas fa-external-link-alt"></i> <span>View Site</span></a>
+        <button class="nav-item" onclick="logout()" style="border:none;background:none;width:100%;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h1>Portfolio</h1>
+          <p class="subtitle">Manage case studies and work samples.</p>
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <div class="editor-container" id="editorSection" style="display:none;">
+        <h3 id="editorTitle">New Project</h3>
+        <input type="hidden" id="editingId">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="itemTitle">Title *</label>
+            <input type="text" id="itemTitle" placeholder="Project name">
+          </div>
+          <div class="form-group">
+            <label for="itemClient">Client</label>
+            <input type="text" id="itemClient" placeholder="Client name">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="itemCategory">Category</label>
+            <select id="itemCategory">
+              <option value="branding">Branding</option>
+              <option value="strategy">Strategy</option>
+              <option value="marketing">Marketing</option>
+              <option value="content">Content</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="itemResults">Results</label>
+            <input type="text" id="itemResults" placeholder="e.g. 340% ROAS, 12K leads">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="itemDescription">Short Description</label>
+          <input type="text" id="itemDescription" placeholder="Brief description for the card view">
+        </div>
+        <div class="form-group">
+          <label for="itemLongDesc">Full Description</label>
+          <textarea class="content-editor" id="itemLongDesc" placeholder="Detailed project description..." style="min-height:150px;"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="itemFeatured" style="margin-right:0.5rem;">
+              Featured project
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="itemStatus">Status</label>
+            <select id="itemStatus">
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
+        <div class="editor-actions">
+          <button class="btn-primary" onclick="saveItem()"><i class="fas fa-save"></i> Save</button>
+          <button class="btn-secondary" onclick="cancelEdit()"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+      </div>
+
+      <!-- Items List -->
+      <div class="admin-toolbar">
+        <div></div>
+        <button class="btn-primary" onclick="showEditor()"><i class="fas fa-plus"></i> New Project</button>
+      </div>
+
+      <div class="admin-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Client</th>
+              <th>Category</th>
+              <th>Featured</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" style="text-align:center;padding:3rem;color:#71717a;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script src="/js/api.js"></script>
+  <script>
+    if (!API.isLoggedIn()) window.location.href = '/admin';
+    function logout() { API.clearToken(); window.location.href = '/admin'; }
+
+    function showEditor(item = null) {
+      const section = document.getElementById('editorSection');
+      section.style.display = 'block';
+      if (item) {
+        document.getElementById('editorTitle').textContent = 'Edit Project';
+        document.getElementById('editingId').value = item.id;
+        document.getElementById('itemTitle').value = item.title;
+        document.getElementById('itemClient').value = item.client || '';
+        document.getElementById('itemCategory').value = item.category || 'branding';
+        document.getElementById('itemResults').value = item.results || '';
+        document.getElementById('itemDescription').value = item.description || '';
+        document.getElementById('itemLongDesc').value = item.long_description || '';
+        document.getElementById('itemFeatured').checked = !!item.featured;
+        document.getElementById('itemStatus').value = item.status || 'published';
+      } else {
+        document.getElementById('editorTitle').textContent = 'New Project';
+        document.getElementById('editingId').value = '';
+        ['itemTitle','itemClient','itemResults','itemDescription','itemLongDesc'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('itemFeatured').checked = false;
+      }
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() { document.getElementById('editorSection').style.display = 'none'; }
+
+    async function saveItem() {
+      const id = document.getElementById('editingId').value;
+      const data = {
+        title: document.getElementById('itemTitle').value,
+        client: document.getElementById('itemClient').value,
+        category: document.getElementById('itemCategory').value,
+        results: document.getElementById('itemResults').value,
+        description: document.getElementById('itemDescription').value,
+        long_description: document.getElementById('itemLongDesc').value,
+        featured: document.getElementById('itemFeatured').checked,
+        status: document.getElementById('itemStatus').value
+      };
+
+      if (!data.title) { showToast('Title required', 'error'); return; }
+
+      try {
+        if (id) { await API.updatePortfolioItem(id, data); showToast('Updated!', 'success'); }
+        else { await API.createPortfolioItem(data); showToast('Created!', 'success'); }
+        cancelEdit(); loadItems();
+      } catch (err) { showToast(err.error || 'Failed', 'error'); }
+    }
+
+    async function loadItems() {
+      try {
+        const data = await API.getAllPortfolio();
+        const tbody = document.getElementById('tableBody');
+        if (data.items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:3rem;color:#71717a;">No portfolio items yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.items.map(item => `
+          <tr>
+            <td><strong>${item.title}</strong></td>
+            <td>${item.client || '—'}</td>
+            <td>${item.category}</td>
+            <td>${item.featured ? '<i class="fas fa-star" style="color:#fbbf24;"></i>' : '—'}</td>
+            <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+            <td>
+              <div class="table-actions">
+                <button class="btn-icon" onclick='editItem(${JSON.stringify(item).replace(/'/g,"&apos;")})'><i class="fas fa-edit"></i></button>
+                <button class="btn-icon danger" onclick="deleteItem(${item.id})"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    function editItem(item) { showEditor(item); }
+
+    async function deleteItem(id) {
+      if (!confirm('Delete this portfolio item?')) return;
+      try { await API.deletePortfolioItem(id); showToast('Deleted', 'success'); loadItems(); }
+      catch { showToast('Failed', 'error'); }
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>
